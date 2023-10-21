@@ -15,7 +15,7 @@
         public ICollection<UserProject> Team { get; set; }
         // Represents all the users that are members of the project.
         public ProjectStatus Status { get; set; }
-        public ICollection<Comment> Comment { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
     public enum ProjectStatus
     {
