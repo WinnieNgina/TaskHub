@@ -12,9 +12,10 @@
         // List of Task objects that represents all the tasks that have been assigned to the user
         public ICollection<Tasks> CreatedTasks { get; set;}
         //  list of Task objects that represents all the tasks that the user has created
-        public ICollection<Project> ProjectManagerList { get; set; }
+        public ICollection<Project> ManagedProjects { get; set; }
         // Represents all projects whereby User is a project manager
         public ICollection<UserProject> UserProjects { get; set; }
         // Represents all projects whereby user is a team member
+        public ICollection<Comment> Comments { get; set; }
     }
 }

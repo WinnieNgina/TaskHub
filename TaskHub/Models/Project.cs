@@ -5,7 +5,7 @@
 
         public string ProjectName { get; set; }
         public string ProjectVersion { get; set; }
-        public string ProjectTittle { get; set; }
+        public string ProjectTitle { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
