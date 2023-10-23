@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace TaskHub.Models
+﻿namespace TaskHub.Models
 {
     public class User
     {
@@ -13,16 +11,14 @@ namespace TaskHub.Models
         public string Phone { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        // public ICollection<ProjectTasks> AssignedTasks { get; set; }
+        public ICollection<ProjectTasks> AssignedTasks { get; set; }
         // List of Task objects that represents all the tasks that have been assigned to the user
-        // [InverseProperty("AssignedTo")]
-        // public ICollection<ProjectTasks> CreatedTasks { get; set;}
-        //  list of Task objects that represents all the tasks that the user has created
+
         public ICollection<Project> ManagedProjects { get; set; }
         // Represents all projects whereby User is a project manager
         public ICollection<UserProject> UserProjects { get; set; }
         // Represents all projects whereby user is a team member
         public ICollection<Comment> Comments { get; set; }
-      
+
     }
 }

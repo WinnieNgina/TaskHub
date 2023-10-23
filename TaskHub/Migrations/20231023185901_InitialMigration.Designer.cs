@@ -12,8 +12,8 @@ using TaskHub.Data;
 namespace TaskHub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231023100601_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20231023185901_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,10 +47,7 @@ namespace TaskHub.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProjectTasksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
+                    b.Property<int>("ProjectTasksId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -60,6 +57,8 @@ namespace TaskHub.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("ProjectTasksId");
 
@@ -110,12 +109,9 @@ namespace TaskHub.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ProjectManagerId");
 
                     b.ToTable("Projects");
                 });
@@ -229,22 +225,40 @@ namespace TaskHub.Migrations
 
             modelBuilder.Entity("TaskHub.Models.Comment", b =>
                 {
-                    b.HasOne("TaskHub.Models.ProjectTasks", null)
+                    b.HasOne("TaskHub.Models.Project", "Project")
                         .WithMany("Comments")
-                        .HasForeignKey("ProjectTasksId");
-
-                    b.HasOne("TaskHub.Models.User", null)
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TaskHub.Models.ProjectTasks", "ProjectTasks")
+                        .WithMany("Comments")
+                        .HasForeignKey("ProjectTasksId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TaskHub.Models.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("ProjectTasks");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskHub.Models.Project", b =>
                 {
-                    b.HasOne("TaskHub.Models.User", null)
+                    b.HasOne("TaskHub.Models.User", "ProjectManager")
                         .WithMany("ManagedProjects")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("ProjectManagerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectManager");
                 });
 
             modelBuilder.Entity("TaskHub.Models.ProjectTasks", b =>
@@ -256,9 +270,9 @@ namespace TaskHub.Migrations
                         .IsRequired();
 
                     b.HasOne("TaskHub.Models.User", "User")
-                        .WithMany()
+                        .WithMany("AssignedTasks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -271,13 +285,13 @@ namespace TaskHub.Migrations
                     b.HasOne("TaskHub.Models.Project", "Project")
                         .WithMany("Team")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaskHub.Models.User", "User")
                         .WithMany("UserProjects")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -287,6 +301,8 @@ namespace TaskHub.Migrations
 
             modelBuilder.Entity("TaskHub.Models.Project", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("ProjectTasks");
 
                     b.Navigation("Team");
@@ -299,6 +315,8 @@ namespace TaskHub.Migrations
 
             modelBuilder.Entity("TaskHub.Models.User", b =>
                 {
+                    b.Navigation("AssignedTasks");
+
                     b.Navigation("Comments");
 
                     b.Navigation("ManagedProjects");

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TaskHub.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,17 +46,17 @@ namespace TaskHub.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProjectManagerId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Projects_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Projects_Users_ProjectManagerId",
+                        column: x => x.ProjectManagerId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,7 +90,7 @@ namespace TaskHub.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -108,13 +108,13 @@ namespace TaskHub.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserProjects_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,9 +128,8 @@ namespace TaskHub.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContentTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    TaskId = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false),
-                    ProjectTasksId = table.Column<int>(type: "int", nullable: true)
+                    ProjectTasksId = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,14 +138,26 @@ namespace TaskHub.Migrations
                         name: "FK_Comments_ProjectTasks_ProjectTasksId",
                         column: x => x.ProjectTasksId,
                         principalTable: "ProjectTasks",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Comments_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_ProjectId",
+                table: "Comments",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_ProjectTasksId",
@@ -159,9 +170,9 @@ namespace TaskHub.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_UserId",
+                name: "IX_Projects_ProjectManagerId",
                 table: "Projects",
-                column: "UserId");
+                column: "ProjectManagerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectTasks_ProjectId",

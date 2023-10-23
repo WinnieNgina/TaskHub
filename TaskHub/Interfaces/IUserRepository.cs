@@ -9,7 +9,7 @@ namespace TaskHub.Interfaces
         User GetUserbyEmail(string email);
         User GetUserByUsername(string username);
         bool UserExists(int userId);
-        
+
         ICollection<Comment> GetComments(int userId);
 
     }

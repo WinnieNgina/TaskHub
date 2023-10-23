@@ -27,14 +27,14 @@ namespace TaskHub.Repository
             return _context.Users.Where(u => u.UserName == username).FirstOrDefault();
         }
 
-        public ICollection<User> GetUsers() 
+        public ICollection<User> GetUsers()
         {
             return _context.Users.OrderBy(u => u.Id).ToList();
         }
 
         public bool UserExists(int userId)
         {
-            return _context.Users.Any(u => u.Id ==  userId);
+            return _context.Users.Any(u => u.Id == userId);
         }
 
         public ICollection<Comment> GetComments(int userId)

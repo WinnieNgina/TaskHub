@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 
@@ -38,7 +37,7 @@ namespace TaskHub.Controllers
         [HttpGet("email/{email}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUserByEmail(string email) 
+        public IActionResult GetUserByEmail(string email)
         {
             var user = _userRepository.GetUserbyEmail(email);
             if (!ModelState.IsValid)
@@ -56,9 +55,9 @@ namespace TaskHub.Controllers
             return Ok(user);
         }
         [HttpGet("{userId}/comments")]
-        [ProducesResponseType(200, Type=typeof(ICollection<Comment>))]
+        [ProducesResponseType(200, Type = typeof(ICollection<Comment>))]
         [ProducesResponseType(400)]
-        public IActionResult GetComments(int userId) 
+        public IActionResult GetComments(int userId)
         {
             if (!_userRepository.UserExists(userId))
                 return NotFound();
