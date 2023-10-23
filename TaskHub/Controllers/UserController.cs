@@ -25,5 +25,47 @@ namespace TaskHub.Controllers
             }
             return Ok(users);
         }
+        [HttpGet("id/{userId}")]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserById(int userId)
+        {
+            var user = _userRepository.GetUserbyId(userId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(user);
+        }
+        [HttpGet("email/{email}")]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserByEmail(string email) 
+        {
+            var user = _userRepository.GetUserbyEmail(email);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(user);
+        }
+        [HttpGet("username/{username}")]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserbyUserName(string userName)
+        {
+            var user = _userRepository.GetUserByUsername(userName);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(user);
+        }
+        [HttpGet("{userId}/comments")]
+        [ProducesResponseType(200, Type=typeof(ICollection<Comment>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetComments(int userId) 
+        {
+            if (!_userRepository.UserExists(userId))
+                return NotFound();
+            var comments = _userRepository.GetComments(userId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(comments);
+        }
     }
 }
