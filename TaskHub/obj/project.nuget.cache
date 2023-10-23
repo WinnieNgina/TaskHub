@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "29kI4R8Arr3nadvxufOZmT/6LA/E0UdFT0VSe07NIEdhODixOfa7/I5F+R/qeufiOovFXl7ATrUrpgi0+YTTGg==",
+  "dgSpecHash": "/wp0oDxcykg3d63B5P82dLtZEBtyI18GtewpL9MNb+V7qU0emikXHBlaJnXmBG1CYnRXmGgWnyUFecjc+s1AwQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\user\\Desktop\\TaskHub\\TaskHub\\TaskHub.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "C:\\Users\\user\\.nuget\\packages\\microsoft.entityframeworkcore.design\\7.0.12\\microsoft.entityframeworkcore.design.7.0.12.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\7.0.12\\microsoft.entityframeworkcore.relational.7.0.12.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\7.0.12\\microsoft.entityframeworkcore.sqlserver.7.0.12.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\7.0.12\\microsoft.entityframeworkcore.tools.7.0.12.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\7.0.0\\microsoft.extensions.caching.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.extensions.caching.memory\\7.0.0\\microsoft.extensions.caching.memory.7.0.0.nupkg.sha512",
