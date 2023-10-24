@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TaskHub.Dto;
+
 using TaskHub.Interfaces;
 using TaskHub.Models;
 
@@ -11,29 +12,32 @@ namespace TaskHub.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
-        public UserController(IUserRepository userRepository, IMapper mapper)
+        
+        public UserController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _mapper = mapper;
+            
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<User>))]
         public IActionResult GetUsers()
         {
-            var users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
-            if (!ModelState.IsValid)
+            var users = _userRepository.GetUsers();
+            return Ok(users.Select(x => new
             {
-                return BadRequest(ModelState);
-            }
-            return Ok(users);
+                x.Id,
+                x.UserName,
+                x.Email,
+                x.FirstName, x.LastName,
+                x.Phone
+            })) ;
         }
         [HttpGet("id/{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
         public IActionResult GetUserById(int userId)
         {
-            var user = _mapper.Map<UserDto>(_userRepository.GetUserbyId(userId));
+            var user = _userRepository.GetUserbyId(userId);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(user);
@@ -43,7 +47,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetUserByEmail(string email)
         {
-            var user = _mapper.Map<UserDto>(_userRepository.GetUserbyEmail(email));
+            var user = _userRepository.GetUserbyEmail(email);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(user);
@@ -51,11 +55,9 @@ namespace TaskHub.Controllers
         [HttpGet("username/{username}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUserbyUserName(string userName)
+        public IActionResult GetUserbyUserName(string username)
         {
-            var user = _mapper.Map<UserDto>(_userRepository.GetUserByUsername(userName));
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var user = _userRepository.GetUserByUsername(username);
             return Ok(user);
         }
         [HttpGet("{userId}/comments")]
@@ -70,5 +72,30 @@ namespace TaskHub.Controllers
                 return BadRequest(ModelState);
             return Ok(comments);
         }
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult CreateUser([FromBody] User userCreate)
+        {
+            if (userCreate == null)
+                return BadRequest(ModelState);
+            var user = _userRepository.GetUsers()
+                .Where(c => c.UserName.Trim().ToUpper() == userCreate.UserName.ToUpper())
+                .FirstOrDefault();
+            if (user != null) 
+            {
+                ModelState.AddModelError("", "User already exists");
+                return StatusCode(422, ModelState);
+            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_userRepository.CreateUser(userCreate))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("User successfully created");
+        }
+
     }
 }

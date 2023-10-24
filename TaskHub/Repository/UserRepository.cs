@@ -41,5 +41,21 @@ namespace TaskHub.Repository
         {
             return _context.Comments.Where(p => p.UserId == userId).ToList();
         }
+
+        public bool CreateUser(User user)
+        {
+            // Change tracker - add, updating, modifying 
+            // Disconnected and connected state 
+            // EntityState.Added - disconnected state
+            _context.Add(user);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            // Actual sql generated and send to the database
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

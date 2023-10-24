@@ -11,6 +11,9 @@ namespace TaskHub.Interfaces
         bool UserExists(int userId);
 
         ICollection<Comment> GetComments(int userId);
+        bool CreateUser (User user);
+        bool Save();
+
 
     }
 }
