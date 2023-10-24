@@ -3,6 +3,8 @@ using TaskHub.Data;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 using TaskStatus = TaskHub.Models.TaskStatus;
+using PriorityLevel = TaskHub.Models.PriorityLevel;
+
 
 namespace TaskHub.Repository
 {
@@ -46,6 +48,11 @@ namespace TaskHub.Repository
         public ProjectTasks GetTaskByTitle(string title)
         {
             return _context.ProjectTasks.Where(pt => pt.Title == title).FirstOrDefault();
+        }
+
+        public PriorityLevel GetTaskPriorityLevel(int taskId)
+        {
+            return _context.ProjectTasks.Where(pt => pt.Id == taskId).Select(pt => pt.Priority).FirstOrDefault();
         }
 
         public ICollection<ProjectTasks> GetTasks()
