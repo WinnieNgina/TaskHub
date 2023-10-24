@@ -75,3 +75,4 @@ C:\Users\user\Desktop\TaskHub\TaskHub\obj\Debug\net7.0\TaskHub.pdb
 C:\Users\user\Desktop\TaskHub\TaskHub\obj\Debug\net7.0\TaskHub.genruntimeconfig.cache
 C:\Users\user\Desktop\TaskHub\TaskHub\obj\Debug\net7.0\ref\TaskHub.dll
 C:\Users\user\Desktop\TaskHub\TaskHub\bin\Debug\net7.0\AutoMapper.dll
+C:\Users\user\Desktop\TaskHub\TaskHub\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

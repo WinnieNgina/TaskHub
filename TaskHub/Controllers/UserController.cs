@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using TaskHub.Dto;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 
@@ -9,15 +11,17 @@ namespace TaskHub.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly IMapper _mapper;
+        public UserController(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<User>))]
         public IActionResult GetUsers()
         {
-            var users = _userRepository.GetUsers();
+            var users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -29,7 +33,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetUserById(int userId)
         {
-            var user = _userRepository.GetUserbyId(userId);
+            var user = _mapper.Map<UserDto>(_userRepository.GetUserbyId(userId));
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(user);
@@ -39,7 +43,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetUserByEmail(string email)
         {
-            var user = _userRepository.GetUserbyEmail(email);
+            var user = _mapper.Map<UserDto>(_userRepository.GetUserbyEmail(email));
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(user);
@@ -49,7 +53,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetUserbyUserName(string userName)
         {
-            var user = _userRepository.GetUserByUsername(userName);
+            var user = _mapper.Map<UserDto>(_userRepository.GetUserByUsername(userName));
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(user);
