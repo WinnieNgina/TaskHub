@@ -14,6 +14,19 @@ namespace TaskHub.Repository
         {
             _context = context;
         }
+
+        public bool CreateTask(ProjectTasks projectTask)
+        {
+            _context.Add(projectTask);
+            return Save();
+        }
+
+        public bool DeleteTask(ProjectTasks projectTask)
+        {
+            _context.Remove(projectTask);
+            return Save();
+        }
+
         public User GetAssignee(int taskId)
         {
             return _context.ProjectTasks.Where(pt => pt.Id == taskId).Select(pt => pt.User).FirstOrDefault();
@@ -64,9 +77,22 @@ namespace TaskHub.Repository
             return _context.ProjectTasks.Where(t => t.Id == taskId).Select(t => t.Status).FirstOrDefault();
         }
 
+        public bool Save()
+        {
+            // Actual sql generated and send to the database
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+
         public bool TaskExists(int id)
         {
             return _context.ProjectTasks.Any(t => t.Id == id);
+        }
+
+        public bool UpdateTask(ProjectTasks projectTask)
+        {
+            _context.Update(projectTask);
+            return Save();
         }
     }
 }

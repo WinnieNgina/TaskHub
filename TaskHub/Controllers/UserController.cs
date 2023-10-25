@@ -115,7 +115,7 @@ namespace TaskHub.Controllers
                 return BadRequest();
             if (!_userRepository.UpdateUser(userUpdate))
             {
-                ModelState.AddModelError("", "Something went wrong while updating category");
+                ModelState.AddModelError("", "Something went wrong while updating user details");
                 return StatusCode(500, ModelState);
             }
             return Ok("User details successfully updated");

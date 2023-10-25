@@ -17,6 +17,11 @@ namespace TaskHub.Interfaces
         DateTime GetDueDate(int taskId);
         ICollection<ProjectTasks> GetTaskbyDesciptionKey(string keyword);
         PriorityLevel GetTaskPriorityLevel(int taskId);
+        bool CreateTask(ProjectTasks projectTask);
+        bool UpdateTask(ProjectTasks projectTask);
+        bool DeleteTask(ProjectTasks projectTask);
+        bool Save();
+
 
 
     }
