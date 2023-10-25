@@ -118,9 +118,30 @@ namespace TaskHub.Controllers
                 ModelState.AddModelError("", "Something went wrong while updating category");
                 return StatusCode(500, ModelState);
             }
-            return NoContent();
-            //when executed will produce a 204 No Content response.
+            return Ok("User details successfully updated");
+            //when executed will produce a 204 No Content response therefore return     No Content()
         }
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteUser(int userId)
+        {
+            if (!_userRepository.UserExists(userId))
+            {
+                return NotFound();
+            }
+            var userToDelete = _userRepository.GetUserbyId(userId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_userRepository.DeleteUser(userToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting user");
+            }
+            return Ok("Good bye! Feels bad to see you abandon us");
+        }
+
+
 
     }
 }

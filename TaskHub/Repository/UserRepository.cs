@@ -63,5 +63,11 @@ namespace TaskHub.Repository
             _context.Update(user);
             return Save();
         }
+
+        public bool DeleteUser(User user)
+        {
+            _context.Remove(user);
+            return Save();
+        }
     }
 }
