@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TaskHub.Data;
+﻿using TaskHub.Data;
 using TaskHub.Interfaces;
 using TaskHub.Models;
-using TaskStatus = TaskHub.Models.TaskStatus;
 using PriorityLevel = TaskHub.Models.PriorityLevel;
+using TaskStatus = TaskHub.Models.TaskStatus;
 
 
 namespace TaskHub.Repository

@@ -1,6 +1,6 @@
 ﻿using TaskHub.Models;
-using TaskStatus = TaskHub.Models.TaskStatus;
 using PriorityLevel = TaskHub.Models.PriorityLevel;
+using TaskStatus = TaskHub.Models.TaskStatus;
 
 namespace TaskHub.Interfaces
 {
@@ -17,7 +17,7 @@ namespace TaskHub.Interfaces
         DateTime GetDueDate(int taskId);
         ICollection<ProjectTasks> GetTaskbyDesciptionKey(string keyword);
         PriorityLevel GetTaskPriorityLevel(int taskId);
-        
+
 
     }
 }

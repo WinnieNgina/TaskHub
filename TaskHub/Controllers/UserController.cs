@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using TaskHub.Dto;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using TaskHub.Interfaces;
 using TaskHub.Models;
@@ -12,11 +10,11 @@ namespace TaskHub.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
-        
+
         public UserController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            
+
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<User>))]
@@ -28,9 +26,10 @@ namespace TaskHub.Controllers
                 x.Id,
                 x.UserName,
                 x.Email,
-                x.FirstName, x.LastName,
+                x.FirstName,
+                x.LastName,
                 x.Phone
-            })) ;
+            }));
         }
         [HttpGet("id/{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
@@ -82,7 +81,7 @@ namespace TaskHub.Controllers
             var user = _userRepository.GetUsers()
                 .Where(c => c.UserName.Trim().ToUpper() == userCreate.UserName.ToUpper())
                 .FirstOrDefault();
-            if (user != null) 
+            if (user != null)
             {
                 ModelState.AddModelError("", "User already exists");
                 return StatusCode(422, ModelState);
@@ -95,6 +94,32 @@ namespace TaskHub.Controllers
                 return StatusCode(500, ModelState);
             }
             return Ok("User successfully created");
+        }
+        [HttpPut("{userId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(204)]
+        public IActionResult UpdateUser(int userId, [FromBody] User userUpdate)
+        {
+            // Refer to controller base class for deeper understanding of the methods and return types
+            if (userUpdate == null)
+                // check if instance is null
+                return BadRequest(ModelState);
+            if (userId != userUpdate.Id)
+                // check if the id passed for update matches ID provided in the instance for updates
+                return BadRequest(ModelState);
+            if (!_userRepository.UserExists(userId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+            if (!_userRepository.UpdateUser(userUpdate))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating category");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+            //when executed will produce a 204 No Content response.
         }
 
     }
