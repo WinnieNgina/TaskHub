@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskHub.Interfaces;
 using TaskHub.Models;
-using TaskHub.Repository;
 using TaskStatus = TaskHub.Models.TaskStatus;
 
 namespace TaskHub.Controllers

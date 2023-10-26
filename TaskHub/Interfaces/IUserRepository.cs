@@ -11,6 +11,8 @@ namespace TaskHub.Interfaces
         bool UserExists(int userId);
 
         ICollection<Comment> GetComments(int userId);
+        ICollection<ProjectTasks> GetUserTaskList(int userId);
+        ICollection<Project> GetProjectsManagedbyUser(int userId);
         bool CreateUser(User user);
         bool UpdateUser(User user);
         bool DeleteUser(User user);

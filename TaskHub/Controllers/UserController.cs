@@ -138,10 +138,32 @@ namespace TaskHub.Controllers
             {
                 ModelState.AddModelError("", "Something went wrong deleting user");
             }
-            return Ok("Good bye! Feels bad to see you abandon us");
+            return Ok("Farewell to the app, and hello to a little extra storage space in your life! ");
         }
-
-
+        [HttpGet("{userId}/ProjectTasks")]
+        [ProducesResponseType(200, Type = typeof(ICollection<ProjectTasks>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserTasksList(int userId)
+        {
+            if (!_userRepository.UserExists(userId))
+                return NotFound();
+            var tasksList = _userRepository.GetUserTaskList(userId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(tasksList);
+        }
+        [HttpGet("{userId}/Projects")]
+        [ProducesResponseType(200, Type = typeof(ICollection<Project>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserProjectsList(int userId)
+        {
+            if (!_userRepository.UserExists(userId))
+                return NotFound();
+            var projectsList = _userRepository.GetProjectsManagedbyUser(userId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(projectsList);
+        }
 
     }
 }

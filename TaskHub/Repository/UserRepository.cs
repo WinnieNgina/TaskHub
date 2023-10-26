@@ -69,5 +69,16 @@ namespace TaskHub.Repository
             _context.Remove(user);
             return Save();
         }
+
+        public ICollection<ProjectTasks> GetUserTaskList(int userId)
+        {
+            return _context.ProjectTasks.Where(p => p.UserId == userId).ToList();
+        }
+
+        public ICollection<Project> GetProjectsManagedbyUser(int userId)
+        {
+            return _context.Projects.Where(p => p.ProjectManagerId == userId).ToList();
+        }
+
     }
 }

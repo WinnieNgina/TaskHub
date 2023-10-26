@@ -11,7 +11,6 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
-        // public User ProjectManager { get; set; } 
         public int ProjectManagerId { get; set; }
         public User ProjectManager { get; set; }
 

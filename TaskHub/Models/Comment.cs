@@ -7,7 +7,6 @@
         public DateTime UpdatedAt { get; set; }
         public string Content { get; set; }
         public string ContentTitle { get; set; }
-
         public int UserId { get; set; }
         public User User { get; set; }
         public int ProjectTasksId { get; set; }
