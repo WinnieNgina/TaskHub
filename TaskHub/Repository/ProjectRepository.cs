@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using TaskHub.Data;
+﻿using TaskHub.Data;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 
@@ -8,6 +7,11 @@ namespace TaskHub.Repository
     public class ProjectRepository : IProjectRepository
     {
         private readonly DataContext _context;
+        public ProjectRepository(DataContext context)
+        {
+            _context = context;
+        }
+
         public bool CreateProject(Project project)
         {
             _context.Add(project);

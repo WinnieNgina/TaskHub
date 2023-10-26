@@ -24,7 +24,7 @@ namespace TaskHub.Controllers
         [HttpGet("id/{projectTaskId}")]
         [ProducesResponseType(200, Type = typeof(ProjectTasks))]
         [ProducesResponseType(400)]
-        public IActionResult GetUserById(int projectTaskId)
+        public IActionResult GetTaskById(int projectTaskId)
         {
             var projectTask = _projectTasksRepository.GetTaskById(projectTaskId);
             if (!ModelState.IsValid)
@@ -34,7 +34,7 @@ namespace TaskHub.Controllers
         [HttpGet("Title/{title}")]
         [ProducesResponseType(200, Type = typeof(ProjectTasks))]
         [ProducesResponseType(400)]
-        public IActionResult GetUserByTitle(string title)
+        public IActionResult GetTaskByTitle(string title)
         {
             var projectTask = _projectTasksRepository.GetTaskByTitle(title);
             if (!ModelState.IsValid)
