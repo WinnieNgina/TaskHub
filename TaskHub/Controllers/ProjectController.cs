@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskHub.Interfaces;
 using TaskHub.Models;
-using TaskHub.Repository;
 
 namespace TaskHub.Controllers
 {
@@ -123,7 +122,7 @@ namespace TaskHub.Controllers
                 return BadRequest(ModelState);
             return Ok(version);
         }
-        [HttpGet("{projectTaskId}/Status")]
+        [HttpGet("{projectId}/Status")]
         [ProducesResponseType(200, Type = typeof(ProjectStatus))]
         [ProducesResponseType(400)]
         public IActionResult GetProjectStatus(int projectTaskId)
@@ -194,7 +193,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateTask(int projectId, [FromBody] Project projectUpdate)
+        public IActionResult UpdateProject(int projectId, [FromBody] Project projectUpdate)
         {
             if (projectUpdate == null)
                 // check if instance is null
