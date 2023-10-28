@@ -164,6 +164,43 @@ namespace TaskHub.Controllers
                 return BadRequest(ModelState);
             return Ok(projectsList);
         }
+        [HttpPost("{userId}/projects/{projectId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult AddUserToProject(int userId, int projectId)
+        {
+            if (!_userRepository.UserExists(userId) || !_userRepository.ProjectExists(projectId))
+            {
+                return NotFound();
+            }
+
+            if (_userRepository.AddUserToProject(userId, projectId))
+            {
+                return Ok("User successfully added to project");
+            }
+
+            ModelState.AddModelError("", "Failed to add user to the project.");
+            return StatusCode(500, ModelState);
+        }
+        [HttpDelete("{userId}/projects/{projectId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult RemoveUserFromProject(int userId, int projectId)
+        {
+            if (!_userRepository.UserExists(userId) || !_userRepository.ProjectExists(projectId))
+            {
+                return NotFound();
+            }
+
+            if (_userRepository.RemoveUserFromProject(userId, projectId))
+            {
+                return Ok("User successfully removed from the project");
+            }
+
+            ModelState.AddModelError("", "Failed to remove user from the project.");
+            return StatusCode(500, ModelState);
+        }
+
 
     }
 }

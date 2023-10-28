@@ -233,5 +233,38 @@ namespace TaskHub.Controllers
             }
             return Ok("Project succesfully deleted");
         }
+        [HttpGet("{projectId}/Team")]
+        [ProducesResponseType(200, Type = typeof(ICollection<User>))]
+        [ProducesResponseType(400)] // Bad Request for model state validation errors
+        [ProducesResponseType(404)]
+        public IActionResult GetUsersByProject(int projectId)
+        {
+            if (projectId <= 0)
+            {
+                ModelState.AddModelError("projectId", "Project ID must be a positive integer.");
+                return BadRequest(ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Check if the project exists
+            if (!_projectRepository.ProjectExists(projectId))
+            {
+                return NotFound();
+            }
+
+            var users = _projectRepository.GetProjectTeam(projectId);
+
+            if (users == null || users.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(users);
+        }
+
     }
 }

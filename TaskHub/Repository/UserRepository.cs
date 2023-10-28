@@ -80,5 +80,35 @@ namespace TaskHub.Repository
             return _context.Projects.Where(p => p.ProjectManagerId == userId).ToList();
         }
 
+        public bool AddUserToProject(int userId, int projectId)
+        {
+            if (!_context.Users.Any(u => u.Id == userId) || !_context.Projects.Any(p => p.Id == projectId))
+                return false;
+
+            var userProject = new UserProject
+            {
+                UserId = userId,
+                ProjectId = projectId
+            };
+            _context.UserProjects.Add(userProject);
+            return Save();
+        }
+
+        public bool RemoveUserFromProject(int userId, int projectId)
+        {
+
+            var userProject = _context.UserProjects.FirstOrDefault(up => up.UserId == userId && up.ProjectId == projectId);
+            if (userProject == null)
+                return false;
+
+            _context.UserProjects.Remove(userProject);
+            return Save();
+        }
+
+        public bool ProjectExists(int projectId)
+        {
+            return _context.Projects.Any(p => p.Id == projectId);
+        }
+
     }
 }

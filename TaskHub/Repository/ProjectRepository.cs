@@ -94,6 +94,11 @@ namespace TaskHub.Repository
             return _context.Projects.Where(p => p.Id == projectId).Select(p => p.ProjectVersion).FirstOrDefault();
         }
 
+        public ICollection<User> GetProjectTeam(int projectId)
+        {
+            return _context.UserProjects.Where(p => p.ProjectId == projectId).Select(p => p.User).ToList();
+        }
+
         public bool ProjectExists(int projectId)
         {
             return _context.Projects.Any(p => p.Id == projectId);

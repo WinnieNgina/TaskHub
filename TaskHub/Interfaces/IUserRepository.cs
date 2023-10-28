@@ -16,6 +16,10 @@ namespace TaskHub.Interfaces
         bool CreateUser(User user);
         bool UpdateUser(User user);
         bool DeleteUser(User user);
+        bool AddUserToProject(int userId, int projectId);
+        bool RemoveUserFromProject(int userId, int projectId);
+
+        bool ProjectExists(int projectId);
         bool Save();
 
 
