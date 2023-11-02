@@ -22,9 +22,9 @@
     }
     public enum ProjectStatus
     {
-        NotStarted,
-        InProgress,
-        Completed
+        NotStarted, // Automatically assigned 0
+        InProgress, // Automatically assigned 1
+        Completed  // Automatically assigned 2
     }
 
 }

@@ -10,9 +10,11 @@ namespace TaskHub.Controllers
     public class ProjectTasksController : ControllerBase
     {
         private readonly IProjectTasksRepository _projectTasksRepository;
-        public ProjectTasksController(IProjectTasksRepository projectTasksRepository)
+        private readonly IUserRepository _userRepository;
+        public ProjectTasksController(IProjectTasksRepository projectTasksRepository, IUserRepository userRepository)
         {
             _projectTasksRepository = projectTasksRepository;
+            _userRepository = userRepository;
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<ProjectTasks>))]
@@ -188,5 +190,62 @@ namespace TaskHub.Controllers
             }
             return Ok("Task succesfully deleted");
         }
+        [HttpPost("{taskId}/Assign/{userId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)] // Conflict status if the task is already assigned
+        public IActionResult AssignTask (int taskId, int userId)
+        {
+            var task = _projectTasksRepository.GetTaskById(taskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+            if (task.UserId != null)
+            {
+                return Conflict("Task is already assigned"); // Check if the task is already assigned
+            }
+            var user = _userRepository.GetUserbyId(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            task.UserId = userId;
+            _projectTasksRepository.UpdateTask(task);
+            return Ok("Task assigned successfully");
+        }
+        [HttpPut("{taskId}/Reassign/{newUserId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        public IActionResult ReassignTask(int taskId, int newUserId)
+        {
+            var task = _projectTasksRepository.GetTaskById(taskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+
+            var newAssignee = _userRepository.GetUserbyId(newUserId);
+            if (newAssignee == null)
+            {
+                return NotFound("New user not found");
+            }
+
+            if (task.UserId == newUserId)
+            {
+                return Conflict("Task is already assigned to the new user");
+            }
+
+            if (task.UserId == null)
+            {
+                return Conflict("Task is not assigned to any user");
+            }
+
+            task.UserId = newUserId;
+            _projectTasksRepository.UpdateTask(task);
+            return Ok("Task reassigned successfully");
+        }
+
     }
 }
