@@ -23,6 +23,14 @@ namespace TaskHub.Controllers
             var projectTasks = _projectTasksRepository.GetTasks();
             return Ok(projectTasks);
         }
+        [HttpGet("DependentTasks/{taskId}")]
+        [ProducesResponseType(200, Type = typeof(ICollection<ProjectTasks>))]
+        public IActionResult GetDependentTasks(int taskId)
+        {
+            // Retrieve dependent tasks based on the provided taskId
+            var dependentTasks = _projectTasksRepository.GetDependentTasks(taskId);
+            return Ok(dependentTasks);
+        }
         [HttpGet("id/{projectTaskId}")]
         [ProducesResponseType(200, Type = typeof(ProjectTasks))]
         [ProducesResponseType(400)]
@@ -194,7 +202,7 @@ namespace TaskHub.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)] // Conflict status if the task is already assigned
-        public IActionResult AssignTask (int taskId, int userId)
+        public IActionResult AssignTask(int taskId, int userId)
         {
             var task = _projectTasksRepository.GetTaskById(taskId);
             if (task == null)
@@ -277,6 +285,20 @@ namespace TaskHub.Controllers
             }
 
             return Ok("Task successfully unassigned"); // Task unassigned successfully
+        }
+        [HttpPost("{taskId}/Add-dependent-tasks{dependentTaskId}")]
+        public IActionResult AddDependency(int taskId, int dependentTaskId)
+        {
+            // Check if the dependency already exists
+            if (_projectTasksRepository.DependencyExists(taskId, dependentTaskId))
+            {
+                return BadRequest("Dependency already exists.");
+            }
+
+            // Add the dependency
+            _projectTasksRepository.AddDependency(taskId, dependentTaskId);
+
+            return Ok("Dependency added successfully");
         }
 
     }

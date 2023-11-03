@@ -14,6 +14,7 @@ namespace TaskHub.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserProject> UserProjects { get; set; }
+        public DbSet<TaskDependency> TaskDependencies { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserProject>()
@@ -46,6 +47,20 @@ namespace TaskHub.Data
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict); // Specify ON DELETE NO ACTION
+            modelBuilder.Entity<TaskDependency>()
+            .HasKey(td => new { td.TaskId, td.DependentTaskId });
+
+            modelBuilder.Entity<TaskDependency>()
+                .HasOne(td => td.ParentTask)
+                .WithMany(t => t.TaskDependencies)
+                .HasForeignKey(td => td.TaskId)
+                .OnDelete(DeleteBehavior.Restrict); // Set to restrict delete
+
+            modelBuilder.Entity<TaskDependency>()
+                .HasOne(td => td.DependentTask)
+                .WithMany()
+                .HasForeignKey(td => td.DependentTaskId)
+                .OnDelete(DeleteBehavior.Cascade); // Set to cascade delete on DependentTask
         }
 
     }

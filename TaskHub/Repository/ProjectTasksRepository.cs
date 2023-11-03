@@ -15,6 +15,42 @@ namespace TaskHub.Repository
             _context = context;
         }
 
+        public bool AddDependency(int taskId, int dependentTaskId)
+        {
+            if (taskId == dependentTaskId)
+            {
+                // You cannot add a task as a dependency of itself.
+                return false;
+            }
+
+            if (DependencyExists(taskId, dependentTaskId))
+            {
+                // The dependency already exists.
+                return false;
+            }
+
+            var task = GetTaskById(taskId);
+            var dependentTask = GetTaskById(dependentTaskId);
+
+            if (task == null || dependentTask == null)
+            {
+                // One or both tasks do not exist.
+                return false;
+            }
+
+            // Create a new TaskDependency entry in the database.
+            var taskDependency = new TaskDependency
+            {
+                TaskId = taskId,
+                DependentTaskId = dependentTaskId
+            };
+
+            _context.TaskDependencies.Add(taskDependency);
+
+            return Save();
+        }
+
+
         public bool CreateTask(ProjectTasks projectTask)
         {
             _context.Add(projectTask);
@@ -27,6 +63,11 @@ namespace TaskHub.Repository
             return Save();
         }
 
+        public bool DependencyExists(int taskId, int dependentTaskId)
+        {
+            return _context.TaskDependencies.Any(td => td.TaskId == taskId && td.DependentTaskId == dependentTaskId);
+        }
+
         public User GetAssignee(int taskId)
         {
             return _context.ProjectTasks.Where(pt => pt.Id == taskId).Select(pt => pt.User).FirstOrDefault();
@@ -35,6 +76,11 @@ namespace TaskHub.Repository
         public ICollection<Comment> GetComments(int projectTasksId)
         {
             return _context.Comments.Where(t => t.ProjectTasksId == projectTasksId).ToList();
+        }
+
+        public ICollection<ProjectTasks> GetDependentTasks(int taskId)
+        {
+            return _context.TaskDependencies.Where(td => td.TaskId == taskId).Select(td => td.DependentTask).ToList();
         }
 
         public DateTime GetDueDate(int taskId)

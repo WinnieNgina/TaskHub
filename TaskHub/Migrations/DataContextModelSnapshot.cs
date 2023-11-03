@@ -115,9 +115,6 @@ namespace TaskHub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssignedBy")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -152,6 +149,21 @@ namespace TaskHub.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ProjectTasks");
+                });
+
+            modelBuilder.Entity("TaskHub.Models.TaskDependency", b =>
+                {
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DependentTaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TaskId", "DependentTaskId");
+
+                    b.HasIndex("DependentTaskId");
+
+                    b.ToTable("TaskDependencies");
                 });
 
             modelBuilder.Entity("TaskHub.Models.User", b =>
@@ -262,6 +274,25 @@ namespace TaskHub.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaskHub.Models.TaskDependency", b =>
+                {
+                    b.HasOne("TaskHub.Models.ProjectTasks", "DependentTask")
+                        .WithMany()
+                        .HasForeignKey("DependentTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskHub.Models.ProjectTasks", "ParentTask")
+                        .WithMany("TaskDependencies")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DependentTask");
+
+                    b.Navigation("ParentTask");
+                });
+
             modelBuilder.Entity("TaskHub.Models.UserProject", b =>
                 {
                     b.HasOne("TaskHub.Models.Project", "Project")
@@ -293,6 +324,8 @@ namespace TaskHub.Migrations
             modelBuilder.Entity("TaskHub.Models.ProjectTasks", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("TaskDependencies");
                 });
 
             modelBuilder.Entity("TaskHub.Models.User", b =>

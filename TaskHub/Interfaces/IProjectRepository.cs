@@ -23,6 +23,7 @@ namespace TaskHub.Interfaces
         bool UpdateProject(Project project);
         bool DeleteProject(Project project);
         ICollection<User> GetProjectTeam(int projectId);
+
         bool Save();
     }
 }
