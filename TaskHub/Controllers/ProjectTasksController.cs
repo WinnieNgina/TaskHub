@@ -211,7 +211,10 @@ namespace TaskHub.Controllers
                 return NotFound("User not found");
             }
             task.UserId = userId;
-            _projectTasksRepository.UpdateTask(task);
+            if (!_projectTasksRepository.UpdateTask(task))
+            {
+                ModelState.AddModelError("", "Something went wrong assign a task");
+            }
             return Ok("Task assigned successfully");
         }
         [HttpPut("{taskId}/Reassign/{newUserId}")]
@@ -243,8 +246,37 @@ namespace TaskHub.Controllers
             }
 
             task.UserId = newUserId;
-            _projectTasksRepository.UpdateTask(task);
+            if (!_projectTasksRepository.UpdateTask(task))
+            {
+                ModelState.AddModelError("", "Something went wrong assign a task");
+            }
             return Ok("Task reassigned successfully");
+        }
+        [HttpDelete("{taskId}/Unassign")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        public IActionResult UnassignTask(int taskId)
+        {
+            var task = _projectTasksRepository.GetTaskById(taskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+
+            if (task.UserId == null)
+            {
+                return Conflict("Task is not assigned to any user");
+            }
+
+            task.UserId = null; // Unassign the task by setting the UserId to null
+            if (!_projectTasksRepository.UpdateTask(task))
+            {
+                ModelState.AddModelError("", "Something went wrong while unassigning the task");
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Task successfully unassigned"); // Task unassigned successfully
         }
 
     }

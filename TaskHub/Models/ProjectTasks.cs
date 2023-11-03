@@ -14,7 +14,7 @@
         public int AssignedBy { get; set; }
 
         // object that represents the user who created the task
-        public int UserId { get; set; } // Foreign key
+        public int? UserId { get; set; } // Foreign key
         public User User { get; set; }
 
         public Project Project { get; set; }
