@@ -1,4 +1,5 @@
-﻿using TaskHub.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskHub.Data;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 using PriorityLevel = TaskHub.Models.PriorityLevel;
@@ -50,6 +51,40 @@ namespace TaskHub.Repository
             return Save();
         }
 
+        public AssignTaskResult AssignTask(int taskId, int userId)
+        {
+            if (!TaskExists(taskId))
+            {
+                return AssignTaskResult.TaskNotFound;
+            }
+
+            var task = GetTaskById(taskId);
+
+            if (task.UserId != null)
+            {
+                return AssignTaskResult.TaskAlreadyAssigned;
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return AssignTaskResult.UserNotFound;
+            }
+
+            // Update the task's status to "Open" and assign it to the user.
+            task.Status = TaskStatus.Open;
+            task.UserId = userId;
+
+            if (Save())
+            {
+                return AssignTaskResult.Success;
+            }
+            else
+            {
+                return AssignTaskResult.Failure;
+            }
+        }
 
         public bool CreateTask(ProjectTasks projectTask)
         {
@@ -140,5 +175,104 @@ namespace TaskHub.Repository
             _context.Update(projectTask);
             return Save();
         }
+        public ReassignTaskResult ReassignTask(int taskId, int newUserId)
+        {
+            var task = GetTaskById(taskId);
+
+            if (task == null)
+            {
+                return ReassignTaskResult.TaskNotFound;
+            }
+
+            int? oldUserId = task.UserId;
+
+            if (oldUserId == newUserId)
+            {
+                return ReassignTaskResult.AlreadyAssignedToNewUser;
+            }
+
+            var isTaskAssignedToNewUserBefore = _context.TaskAssignmentHistories
+                .Any(history => history.TaskId == taskId &&
+                (history.OldUserId == newUserId || history.NewUserId == newUserId));
+
+            if (isTaskAssignedToNewUserBefore)
+            {
+                return ReassignTaskResult.AlreadyAssignedToNewUser;
+            }
+
+            if (!oldUserId.HasValue)
+            {
+                // The task was never assigned before.
+                return ReassignTaskResult.TaskNeverAssigned;
+            }
+
+            if (oldUserId.Value != newUserId)
+            {
+                // Log the historical assignment change.
+                var historyEntry = new TaskAssignmentHistory
+                {
+                    TaskId = taskId,
+                    OldUserId = oldUserId.Value, // Make sure this is the current assignee.
+                    NewUserId = newUserId, // This is the new assignee.
+                    ReassignmentDate = DateTime.UtcNow
+                };
+
+                // Store this history entry in your database.
+                _context.TaskAssignmentHistories.Add(historyEntry);
+
+                // Now update the task's UserId to the new user.
+                task.UserId = newUserId;
+
+                // Update the status of the old user's task to "Cancelled."
+                var oldUserTask = _context.ProjectTasks.FirstOrDefault(pt => pt.Id == taskId && pt.UserId == oldUserId.Value);
+                if (oldUserTask != null)
+                {
+                    oldUserTask.Status = TaskStatus.Cancelled;
+                }
+
+                // This part should only happen after the historical entry is added.
+                task.Status = TaskStatus.Open;
+
+                if (Save()) // This should save both the history log and the task update in one transaction.
+                {
+                    return ReassignTaskResult.Success;
+                }
+                else
+                {
+                    return ReassignTaskResult.Failure;
+                }
+            }
+            else
+            {
+                // This case should never happen as we check for oldUserId == newUserId above.
+                // Log this as an error or handle according to your business logic.
+                return ReassignTaskResult.Failure;
+            }
+        }
+        public ICollection<User> GetUsersInAssignmentHistoryForTask(int taskId)
+        {
+            // Retrieve the task and its assignment history
+            var task = _context.ProjectTasks
+                .Include(t => t.AssignmentHistory)
+                .FirstOrDefault(t => t.Id == taskId);
+
+            if (task == null)
+            {
+                return null; // Task not found
+            }
+
+            // Extract unique user IDs from the assignment history
+            var userIds = task.AssignmentHistory
+                .SelectMany(history => new[] { history.OldUserId, history.NewUserId })
+                .Distinct(); // This ensures each user ID is only considered once.
+
+            // Retrieve user information for the unique user IDs in the assignment history
+            var usersInAssignmentHistory = _context.Users
+                .Where(user => userIds.Contains(user.Id))
+                .ToList();
+
+            return usersInAssignmentHistory;
+        }
+
     }
 }

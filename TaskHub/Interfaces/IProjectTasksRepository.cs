@@ -23,9 +23,30 @@ namespace TaskHub.Interfaces
         bool CreateTask(ProjectTasks projectTask);
         bool UpdateTask(ProjectTasks projectTask);
         bool DeleteTask(ProjectTasks projectTask);
+        AssignTaskResult AssignTask(int taskId, int userId);
+        ReassignTaskResult ReassignTask(int taskId, int newUserId);
+        ICollection<User> GetUsersInAssignmentHistoryForTask(int taskId);
         bool Save();
 
 
 
     }
+    public enum AssignTaskResult
+    {
+        Success,
+        Failure,
+        TaskNotFound,
+        TaskAlreadyAssigned,
+        UserNotFound
+    }
+    public enum ReassignTaskResult
+    {
+        Success,
+        TaskNotFound,
+        NewUserNotFound,
+        AlreadyAssignedToNewUser,
+        TaskNeverAssigned,
+        Failure
+    }
+
 }

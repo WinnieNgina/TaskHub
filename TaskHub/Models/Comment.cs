@@ -9,11 +9,9 @@
         public string ContentTitle { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
-        public int ProjectTasksId { get; set; }
+        public int? ProjectTasksId { get; set; }
         public ProjectTasks ProjectTasks { get; set; }
-        public int ProjectId { get; set; }
+        public int? ProjectId { get; set; }
         public Project Project { get; set; }
-
-
     }
 }

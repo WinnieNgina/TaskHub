@@ -15,6 +15,7 @@ namespace TaskHub.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserProject> UserProjects { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
+        public DbSet<TaskAssignmentHistory> TaskAssignmentHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserProject>()

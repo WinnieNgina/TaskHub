@@ -18,6 +18,7 @@
         public int ProjectId { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<TaskDependency> TaskDependencies { get; set; }
+        public ICollection<TaskAssignmentHistory> AssignmentHistory { get; set; }
 
     }
     public enum TaskStatus
@@ -25,9 +26,16 @@
         ToDo,
         Open,
         Due,
-        OverDue,
+        Overdue,
         InProgress,
-        Completed
+        Completed,
+        Rejected,
+        Rescheduled,
+        UnderReview,
+        OnHold,
+        Deferred,
+        Cancelled,
+        Archived,
     }
     public enum PriorityLevel
     {

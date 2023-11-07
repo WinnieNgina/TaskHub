@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskHub.Dto;
 using TaskHub.Interfaces;
 using TaskHub.Models;
 using TaskStatus = TaskHub.Models.TaskStatus;
@@ -23,6 +24,38 @@ namespace TaskHub.Controllers
             var projectTasks = _projectTasksRepository.GetTasks();
             return Ok(projectTasks);
         }
+        [HttpGet("{taskId}/AssignmentHistory")]
+        [ProducesResponseType(200, Type = typeof(ICollection<User>))]
+        [ProducesResponseType(404)]
+        public IActionResult GetAssignmentHistory(int taskId)
+        {
+            var task = _projectTasksRepository.GetTaskById(taskId);
+
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+
+            var assignmentHistory = _projectTasksRepository.GetUsersInAssignmentHistoryForTask(taskId);
+
+            if (assignmentHistory == null || !assignmentHistory.Any())
+            {
+                // Return a different message if there's no assignment history
+                return NotFound("No assignment history found for the task");
+            }
+
+            // Optionally transform the user entities into a DTO representation
+            var assignmentHistoryDto = assignmentHistory.Select(user => new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName
+                
+            });
+
+            return Ok(assignmentHistoryDto);
+        }
+
+
         [HttpGet("DependentTasks/{taskId}")]
         [ProducesResponseType(200, Type = typeof(ICollection<ProjectTasks>))]
         public IActionResult GetDependentTasks(int taskId)
@@ -204,62 +237,77 @@ namespace TaskHub.Controllers
         [ProducesResponseType(409)] // Conflict status if the task is already assigned
         public IActionResult AssignTask(int taskId, int userId)
         {
-            var task = _projectTasksRepository.GetTaskById(taskId);
-            if (task == null)
+            var result = _projectTasksRepository.AssignTask(taskId, userId);
+
+            if (result == AssignTaskResult.Success)
+            {
+                return Ok("Task assigned successfully");
+            }
+            else if (result == AssignTaskResult.TaskNotFound)
             {
                 return NotFound("Task not found");
             }
-            if (task.UserId != null)
+            else if (result == AssignTaskResult.TaskAlreadyAssigned)
             {
-                return Conflict("Task is already assigned"); // Check if the task is already assigned
+                return Conflict("Task is already assigned");
             }
-            var user = _userRepository.GetUserbyId(userId);
-            if (user == null)
+            else if (result == AssignTaskResult.UserNotFound)
             {
                 return NotFound("User not found");
             }
-            task.UserId = userId;
-            if (!_projectTasksRepository.UpdateTask(task))
+            else
             {
-                ModelState.AddModelError("", "Something went wrong assign a task");
+                ModelState.AddModelError("", "Something went wrong assigning the task");
+                return BadRequest(ModelState);
             }
-            return Ok("Task assigned successfully");
         }
         [HttpPut("{taskId}/Reassign/{newUserId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
+        [ProducesResponseType(422)] // HTTP 422 Unprocessable Entity
         public IActionResult ReassignTask(int taskId, int newUserId)
         {
-            var task = _projectTasksRepository.GetTaskById(taskId);
-            if (task == null)
+            var reassignmentResult = _projectTasksRepository.ReassignTask(taskId, newUserId);
+
+            if (reassignmentResult == ReassignTaskResult.Success)
+            {
+                return Ok("Task reassigned successfully");
+            }
+
+            if (reassignmentResult == ReassignTaskResult.TaskNotFound)
             {
                 return NotFound("Task not found");
             }
 
-            var newAssignee = _userRepository.GetUserbyId(newUserId);
-            if (newAssignee == null)
+            if (reassignmentResult == ReassignTaskResult.NewUserNotFound)
             {
                 return NotFound("New user not found");
             }
 
-            if (task.UserId == newUserId)
+            if (reassignmentResult == ReassignTaskResult.AlreadyAssignedToNewUser)
             {
                 return Conflict("Task is already assigned to the new user");
             }
 
-            if (task.UserId == null)
+            if (reassignmentResult == ReassignTaskResult.TaskNeverAssigned)
             {
-                return Conflict("Task is not assigned to any user");
+                // Respond with 422 Unprocessable Entity to indicate the task cannot be processed as it has never been assigned
+                ModelState.AddModelError("", "Task was never assigned and cannot be reassigned");
+                return UnprocessableEntity(ModelState);
             }
 
-            task.UserId = newUserId;
-            if (!_projectTasksRepository.UpdateTask(task))
+            if (reassignmentResult == ReassignTaskResult.Failure)
             {
-                ModelState.AddModelError("", "Something went wrong assign a task");
+                ModelState.AddModelError("", "Something went wrong reassigning the task");
+                return BadRequest(ModelState);
             }
-            return Ok("Task reassigned successfully");
+
+            // If none of the above, return a generic 409 Conflict
+            ModelState.AddModelError("", "An unknown error occurred");
+            return Conflict(ModelState);
         }
+
         [HttpDelete("{taskId}/Unassign")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
