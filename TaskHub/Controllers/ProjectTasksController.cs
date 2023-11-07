@@ -39,6 +39,7 @@ namespace TaskHub.Controllers
             var assignmentHistory = _projectTasksRepository.GetUsersInAssignmentHistoryForTask(taskId);
 
             if (assignmentHistory == null || !assignmentHistory.Any())
+            // .Any() method is a LINQ extension method that checks if there are any elements in the collection.
             {
                 // Return a different message if there's no assignment history
                 return NotFound("No assignment history found for the task");
@@ -287,7 +288,7 @@ namespace TaskHub.Controllers
 
             if (reassignmentResult == ReassignTaskResult.AlreadyAssignedToNewUser)
             {
-                return Conflict("Task is already assigned to the new user");
+                return Conflict("Task is already assigned to this user and they couldn't complete it sucessfully");
             }
 
             if (reassignmentResult == ReassignTaskResult.TaskNeverAssigned)
