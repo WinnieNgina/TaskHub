@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using TaskHub.Dto;
 using TaskHub.Interfaces;
 using TaskHub.Models;
@@ -12,10 +13,12 @@ namespace TaskHub.Controllers
     {
         private readonly IProjectTasksRepository _projectTasksRepository;
         private readonly IUserRepository _userRepository;
-        public ProjectTasksController(IProjectTasksRepository projectTasksRepository, IUserRepository userRepository)
+        private readonly IConfiguration _configuration;
+        public ProjectTasksController(IProjectTasksRepository projectTasksRepository, IUserRepository userRepository, IConfiguration configuration)
         {
             _projectTasksRepository = projectTasksRepository;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ICollection<ProjectTasks>))]
@@ -50,7 +53,7 @@ namespace TaskHub.Controllers
             {
                 Id = user.Id,
                 UserName = user.UserName
-                
+
             });
 
             return Ok(assignmentHistoryDto);
@@ -349,6 +352,45 @@ namespace TaskHub.Controllers
 
             return Ok("Dependency added successfully");
         }
+        [HttpPost("upload/{taskId}")]
+        [ProducesResponseType(200)] // Indicates success
+        [ProducesResponseType(400)] // Indicates a bad request
+        [ProducesResponseType(404)] // Indicates that the task was not found
+        [ProducesResponseType(500)] // Indicates a server error
+        public async Task<IActionResult> UploadFiles(int taskId, [FromForm] IFormFile file, [FromForm] IEnumerable<IFormFile> files)
+        {
+            if (!_projectTasksRepository.TaskExists(taskId))
+            {
+                return NotFound("Task not found.");
+            }
 
+            var uploadsFolderPath = _configuration.GetValue<string>("FileStoragePath");
+            if (string.IsNullOrEmpty(uploadsFolderPath))
+            {
+                return StatusCode(500, "Upload path is not configured correctly.");
+            }
+
+            var allFiles = new List<IFormFile>();
+            if (file != null)
+            {
+                allFiles.Add(file);
+            }
+            if (files != null)
+            {
+                allFiles.AddRange(files);
+            }
+            if (!allFiles.Any())
+            {
+                return BadRequest("No files provided for upload.");
+            }
+
+            var (isSuccess, errorMessage) = await _projectTasksRepository.UploadTaskReportFilesAsync(taskId, allFiles, uploadsFolderPath);
+            if (!isSuccess)
+            {
+                return BadRequest(errorMessage);
+            }
+
+            return Ok("Files uploaded successfully.");
+        }
     }
 }

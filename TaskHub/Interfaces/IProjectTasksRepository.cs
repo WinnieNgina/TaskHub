@@ -26,9 +26,8 @@ namespace TaskHub.Interfaces
         AssignTaskResult AssignTask(int taskId, int userId);
         ReassignTaskResult ReassignTask(int taskId, int newUserId);
         ICollection<User> GetUsersInAssignmentHistoryForTask(int taskId);
+        Task<(bool, string)> UploadTaskReportFilesAsync(int taskId, IEnumerable<IFormFile> files, string uploadsFolderPath);
         bool Save();
-
-
 
     }
     public enum AssignTaskResult

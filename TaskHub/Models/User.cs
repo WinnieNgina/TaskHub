@@ -11,6 +11,7 @@
         public string Phone { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string? ProfilePicturePath { get; set; }
         public ICollection<ProjectTasks> AssignedTasks { get; set; }
         // List of Task objects that represents all the tasks that have been assigned to the user
 

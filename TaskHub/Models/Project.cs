@@ -3,8 +3,8 @@
     public class Project
     {
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public string ProjectName { get; set; }
         public string ProjectVersion { get; set; }
         public string ProjectTitle { get; set; }
@@ -19,6 +19,7 @@
         // Represents all the users that are members of the project.
         public ProjectStatus Status { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<ProjectFile> ProjectFiles { get; set; }
     }
     public enum ProjectStatus
     {

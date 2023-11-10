@@ -274,5 +274,60 @@ namespace TaskHub.Repository
             return usersInAssignmentHistory;
         }
 
-    }
+        public async Task<(bool, string)> UploadTaskReportFilesAsync(int taskId, IEnumerable<IFormFile> files, string uploadsFolderPath)
+        {
+            var task = await _context.ProjectTasks.Include(t => t.ReportFiles).FirstOrDefaultAsync(t => t.Id == taskId);
+            var uploadErrors = new List<string>();
+            var allowedExtensions = new HashSet<string> { ".jpg", ".png", ".txt", ".pdf" }; // Use hasset because it does not allow duplicates
+            foreach (var file in files)
+            {
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+                // check for empty files 
+                if (file.Length <= 0)
+                {
+                    uploadErrors.Add($"File '{file.FileName}' is empty and was not uploaded.");
+                    continue;
+                }
+                // check for unacceptable file extensions
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    uploadErrors.Add($"File '{file.FileName}' has an invalid extension and was not uploaded.");
+                    continue;
+                }
+                var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                var filePath = Path.Combine(uploadsFolderPath, uniqueFileName);
+                try
+                {
+                    // Streaming the file with a specified buffer size
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    var taskReportFile = new TaskReportFile
+                    {
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        Size = file.Length,
+                        UploadedOn = DateTime.UtcNow,
+                        FilePath = filePath,
+                        ProjectTaskId = taskId,
+                    };
+                    _context.TaskReportFiles.Add(taskReportFile);
+                }
+                catch (Exception ex)
+                {
+                    uploadErrors.Add($"Error uploading file {file.FileName}:  {ex.Message}");
+                }
+            }
+            if (uploadErrors.Any())
+            {
+                var errorMessage = string.Join("; ", uploadErrors);
+                return (false, errorMessage);
+            }
+            var saveResult = await _context.SaveChangesAsync() > 0;
+            return (saveResult, saveResult ? string.Empty : "Failerd to save changes.");
+            }
+                    
+        }
 }
+

@@ -107,6 +107,39 @@ namespace TaskHub.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("TaskHub.Models.ProjectFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UploadedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectFiles");
+                });
+
             modelBuilder.Entity("TaskHub.Models.ProjectTasks", b =>
                 {
                     b.Property<int>("Id")
@@ -193,6 +226,39 @@ namespace TaskHub.Migrations
                     b.ToTable("TaskDependencies");
                 });
 
+            modelBuilder.Entity("TaskHub.Models.TaskReportFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UploadedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectTaskId");
+
+                    b.ToTable("TaskReportFiles");
+                });
+
             modelBuilder.Entity("TaskHub.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -217,6 +283,9 @@ namespace TaskHub.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfilePicturePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -280,6 +349,17 @@ namespace TaskHub.Migrations
                     b.Navigation("ProjectManager");
                 });
 
+            modelBuilder.Entity("TaskHub.Models.ProjectFile", b =>
+                {
+                    b.HasOne("TaskHub.Models.Project", "Project")
+                        .WithMany("ProjectFiles")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("TaskHub.Models.ProjectTasks", b =>
                 {
                     b.HasOne("TaskHub.Models.Project", "Project")
@@ -328,6 +408,17 @@ namespace TaskHub.Migrations
                     b.Navigation("ParentTask");
                 });
 
+            modelBuilder.Entity("TaskHub.Models.TaskReportFile", b =>
+                {
+                    b.HasOne("TaskHub.Models.ProjectTasks", "ProjectTask")
+                        .WithMany("ReportFiles")
+                        .HasForeignKey("ProjectTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectTask");
+                });
+
             modelBuilder.Entity("TaskHub.Models.UserProject", b =>
                 {
                     b.HasOne("TaskHub.Models.Project", "Project")
@@ -351,6 +442,8 @@ namespace TaskHub.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("ProjectFiles");
+
                     b.Navigation("ProjectTasks");
 
                     b.Navigation("Team");
@@ -361,6 +454,8 @@ namespace TaskHub.Migrations
                     b.Navigation("AssignmentHistory");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("ReportFiles");
 
                     b.Navigation("TaskDependencies");
                 });

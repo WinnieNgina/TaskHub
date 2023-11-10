@@ -4,8 +4,8 @@
     {
 
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime DueDate { get; set; }
@@ -19,6 +19,7 @@
         public ICollection<Comment> Comments { get; set; }
         public ICollection<TaskDependency> TaskDependencies { get; set; }
         public ICollection<TaskAssignmentHistory> AssignmentHistory { get; set; }
+        public ICollection<TaskReportFile> ReportFiles { get; set; }
 
     }
     public enum TaskStatus
