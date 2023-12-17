@@ -325,7 +325,7 @@ namespace TaskHub.Repository
                 return (false, errorMessage);
             }
             var saveResult = await _context.SaveChangesAsync() > 0;
-            return (saveResult, saveResult ? string.Empty : "Failerd to save changes.");
+            return (saveResult, saveResult ? string.Empty : "Failed to save changes.");
             }
                     
         }
